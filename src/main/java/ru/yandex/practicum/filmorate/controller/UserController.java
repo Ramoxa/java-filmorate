@@ -1,69 +1,88 @@
 package ru.yandex.practicum.filmorate.controller;
 
+
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    private Integer id = 0;
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<List<User>> findAll() {
         log.info("Вызван список пользователей.");
-        return ResponseEntity.ok(new ArrayList<>(users.values()));
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity findById(@PathVariable Integer id) {
-        if (users.containsKey(id)) {
+    public ResponseEntity<User> findById(@PathVariable Integer id) {
+        User user = userService.getUser(id);
+        if (user != null) {
             log.info("Получен запрос на пользователя с id = {}", id);
-            return ResponseEntity.ok(users.get(id));
+            return ResponseEntity.ok(user);
         } else {
             log.error("Пользователь с ID {} не найден.", id);
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Пользователь с ID " + id + " не найден.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     @PostMapping
-    public ResponseEntity create(@Valid @RequestBody User user) {
+    public ResponseEntity<User> create(@Valid @RequestBody User user) {
         log.debug("Получен запрос на создание пользователя с телом: {}", user);
-        user.setId(generateId());
-        users.put(user.getId(), user);
-        log.info("Добавлен пользователь: {}", user);
-        return ResponseEntity.status(201).body(user);
+        User createdUser = userService.create(user);
+        log.info("Добавлен пользователь: {}", createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping
-    public ResponseEntity update(@Valid @RequestBody User user) {
-        Integer userId = user.getId();
-        if (!users.containsKey(userId)) {
-            log.error("Ошибка обновления: пользователь с ID {} не найден.", userId);
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Ошибка обновления: пользователь с ID " + userId + " не найден.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    public ResponseEntity<User> update(@Valid @RequestBody User user) {
+        if (userService.getUser(user.getId()) == null) {
+            log.error("Ошибка обновления: пользователь с ID {} не найден.", user.getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        users.put(userId, user);
-        log.info("Обновлен пользователь: {}", user);
-        return ResponseEntity.ok(user);
+        User updatedUser = userService.update(user);
+        log.info("Обновлен пользователь: {}", updatedUser);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    private Integer generateId() {
-        return ++id;
+    @PutMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<?> addFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.addFriend(id, friendId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<?> removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFriend(id, friendId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/friends")
+    public ResponseEntity<List<User>> getFriends(@PathVariable int id) {
+        return ResponseEntity.ok(userService.findUserFriends(id));
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public ResponseEntity<Set<User>> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        Set<User> commonFriends = userService.getCommonFriends(id, otherId);
+        return ResponseEntity.ok(commonFriends);
     }
 }

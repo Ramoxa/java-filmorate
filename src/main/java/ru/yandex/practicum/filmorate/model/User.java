@@ -4,6 +4,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class User {
@@ -12,6 +14,7 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private Set<Integer> friends = new HashSet<>();
 
     public User(String email, String login, String name, LocalDate birthday) {
         setEmail(email);
@@ -32,8 +35,8 @@ public class User {
     }
 
     public void setLogin(String login) {
-        if (login == null || login.contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
+        if (login == null || login.trim().isEmpty() || login.contains(" ")) {
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
         }
         this.login = login;
     }

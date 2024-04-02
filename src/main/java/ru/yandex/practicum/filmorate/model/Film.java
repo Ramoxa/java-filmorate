@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.Getter;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -12,6 +15,9 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+
+    @Getter
+    private Set<Integer> likes = new HashSet<>();
 
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
