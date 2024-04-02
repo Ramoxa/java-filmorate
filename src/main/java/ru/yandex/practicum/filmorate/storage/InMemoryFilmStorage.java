@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -44,7 +45,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         validateUserExists(userId);
         validateFilmExists(filmId);
         Film film = films.get(filmId);
-        film.getLikes().remove(userId);
+        film.getLikes().remove((Integer) userId);
     }
 
     @Override
@@ -54,7 +55,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getMostLikedFilms(int count) {
-        return films.values().stream().sorted(Comparator.comparingInt(f -> -f.getLikes().size())).limit(count).collect(Collectors.toList());
+        return films.values().stream()
+                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     private void validateFilmExists(int filmId) {
