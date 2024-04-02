@@ -70,9 +70,7 @@ public class UserService {
         if (user == null) {
             throw new IllegalArgumentException("Пользователь с ID=" + userId + " не найден.");
         }
-        return user.getFriends().stream()
-                .map(this::getUser)
-                .collect(Collectors.toList());
+        return user.getFriends().stream().map(this::getUser).collect(Collectors.toList());
     }
 
     public Set<User> getCommonFriends(int userId, int otherUserId) {
@@ -83,8 +81,6 @@ public class UserService {
         }
         Set<Integer> userFriends = new HashSet<>(user.getFriends());
         userFriends.retainAll(otherUser.getFriends());
-        return userFriends.stream()
-                .map(this::getUser)
-                .collect(Collectors.toSet());
+        return userFriends.stream().map(this::getUser).collect(Collectors.toSet());
     }
 }

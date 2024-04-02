@@ -54,10 +54,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getMostLikedFilms(int count) {
-        return films.values().stream()
-                .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return films.values().stream().sorted(Comparator.comparingInt(f -> -f.getLikes().size())).limit(count).collect(Collectors.toList());
     }
 
     private void validateFilmExists(int filmId) {
