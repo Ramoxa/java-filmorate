@@ -25,21 +25,21 @@ public class FilmController {
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
-
+    public static final String COUNT_OF_POPULAR_FILM = "10";
     @GetMapping
-    public ResponseEntity<List<Film>> findAll() {
+    public ResponseEntity findAll() {
         log.info("Вызван список фильмов.");
         return ResponseEntity.ok(filmService.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<Film> create(@Valid @RequestBody Film film) {
+    public ResponseEntity create(@Valid @RequestBody Film film) {
         log.info("Добавлен фильм: {}", film);
-        return new ResponseEntity<>(filmService.create(film), HttpStatus.CREATED);
+        return new ResponseEntity(filmService.create(film), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<Film> update(@Valid @RequestBody Film film) {
+    public ResponseEntity update(@Valid @RequestBody Film film) {
         log.info("Обновлен фильм: {}", film);
         return ResponseEntity.ok(filmService.update(film));
     }
@@ -65,7 +65,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getMostLikedFilms(@RequestParam(defaultValue = "10") int count) {
-        return ResponseEntity.ok(filmService.getTopLikedFilms(count));
+    public List getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getPopularFilms(count);
     }
+
 }

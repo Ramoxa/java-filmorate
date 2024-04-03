@@ -5,10 +5,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -16,59 +13,41 @@ import java.util.stream.Collectors;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
-    private final AtomicInteger filmIdCounter = new AtomicInteger();
+    private final AtomicInteger idGenerator = new AtomicInteger();
 
-    private final Map<Integer, User> users = new HashMap<>();
+    @Override
+    public Collection<Film> findAll() {
+        return films.values();
+    }
+
+    @Override
+    public Optional<Film> findById(int id) {
+        return Optional.ofNullable(films.get(id));
+    }
 
     @Override
     public Film create(Film film) {
-        film.setId(filmIdCounter.incrementAndGet());
-        films.put(film.getId(), film);
+        int id = idGenerator.incrementAndGet();
+        film.setId(id);
+        films.put(id, film);
         return film;
     }
 
     @Override
     public Film update(Film film) {
-        validateFilmExists(film.getId());
-        films.put(film.getId(), film);
+        int id = film.getId();
+        if (!films.containsKey(id)) {
+            throw new NoSuchElementException("Film not found with ID: " + id);
+        }
+        films.put(id, film);
         return film;
     }
 
     @Override
-    public void addLike(int filmId, int userId) {
-        validateUserExists(userId);
-        validateFilmExists(filmId);
-        Film film = films.get(filmId);
-        film.getLikes().add(userId);
-    }
-
-    @Override
-    public void removeLike(int filmId, int userId) {
-        validateUserExists(userId);
-        validateFilmExists(filmId);
-        Film film = films.get(filmId);
-        film.getLikes().remove(userId);
-    }
-
-    @Override
-    public List<Film> findAll() {
-        return new ArrayList<>(films.values());
-    }
-
-    @Override
-    public List<Film> getMostLikedFilms(int count) {
-        return films.values().stream().sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size())).limit(count).collect(Collectors.toList());
-    }
-
-    private void validateFilmExists(int filmId) {
-        if (!films.containsKey(filmId)) {
-            throw new NotFoundException("Film not found with ID: " + filmId);
+    public void deleteById(int id) {
+        if (!films.containsKey(id)) {
+            throw new NoSuchElementException("Film not found with ID: " + id);
         }
-    }
-
-    private void validateUserExists(int userId) {
-        if (!users.containsKey(userId)) {
-            throw new NotFoundException("User not found with ID: " + userId);
-        }
+        films.remove(id);
     }
 }

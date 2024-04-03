@@ -15,9 +15,7 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
-
-    @Getter
-    private Set<Integer> likes = new HashSet<>();
+    private Set <Integer> likes;
 
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
