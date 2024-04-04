@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -42,17 +42,17 @@ public class FilmService {
 
     public void addLike(int filmId, int userId) {
         if (!userStorage.findId(userId)) {
-            throw new ValidationException("User not found with ID: " + userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Юзер не найден: " + userId);
         }
-        Film film = filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Film not found with ID: " + filmId));
+        Film film = filmStorage.findById(filmId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден: " + filmId));
         film.getLikes().add(userId);
     }
 
     public void removeLike(int filmId, int userId) {
         if (!userStorage.findId(userId)) {
-            throw new ValidationException("User not found with ID: " + userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Юзер не найден: " + userId);
         }
-        Film film = filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Film not found with ID: " + filmId));
+        Film film = filmStorage.findById(filmId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден: " + filmId));
         film.getLikes().remove(userId);
     }
 }

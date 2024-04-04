@@ -59,7 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private void validateFilmExists(int filmId) {
         if (!films.containsKey(filmId)) {
-            throw new NotFoundException("Film not found with ID: " + filmId);
+            throw new NotFoundException("Фильм не найден ID: " + filmId);
         }
     }
 

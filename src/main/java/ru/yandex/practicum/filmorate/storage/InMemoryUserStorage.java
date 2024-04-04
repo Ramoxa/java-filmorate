@@ -80,7 +80,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     private void validateUserExists(int userId) {
         if (!users.containsKey(userId)) {
-            throw new NotFoundException("User not found with ID: " + userId);
+            throw new NotFoundException("Юзер не найден ID: " + userId);
         }
     }
 }

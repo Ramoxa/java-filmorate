@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    public static final String COUNT_OF_POPULAR_FILM = "10";
     private final FilmService filmService;
 
     @Autowired
@@ -49,6 +48,7 @@ public class FilmController {
     public ResponseEntity addLike(@PathVariable int id, @PathVariable int userId) {
         try {
             filmService.addLike(id, userId);
+            log.info("Юзер с ID: {} поставил лайк фильму с ID: {}", userId, id);
             return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -59,6 +59,7 @@ public class FilmController {
     public ResponseEntity removeLike(@PathVariable int id, @PathVariable int userId) {
         try {
             filmService.removeLike(id, userId);
+            log.info("Юзер с ID: {} удалил лайк фильма с ID: {}", userId, id);
             return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -67,6 +68,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Вызыван список {} самых популрных фильмов", count);
         return filmService.getPopularFilms(count);
     }
 
