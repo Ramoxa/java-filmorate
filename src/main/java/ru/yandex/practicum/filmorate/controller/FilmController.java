@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
+    public static final String COUNT_OF_POPULAR_FILM = "10";
     private final FilmService filmService;
 
     @Autowired
@@ -44,7 +45,6 @@ public class FilmController {
         return ResponseEntity.ok(filmService.update(film));
     }
 
-
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity addLike(@PathVariable int id, @PathVariable int userId) {
         try {
@@ -66,8 +66,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Самые популярные фильмы", count);
+    public List getPopularFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopularFilms(count);
     }
+
 }

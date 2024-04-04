@@ -64,6 +64,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public boolean findId(int userId) {
+        return users.containsKey(userId);
+    }
+
+    @Override
     public List<User> findFriends(int userId) {
         validateUserExists(userId);
         List<User> friends = new ArrayList<>();

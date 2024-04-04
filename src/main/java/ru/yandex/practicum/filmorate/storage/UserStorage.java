@@ -20,6 +20,8 @@ public interface UserStorage {
 
     User findById(int userId);
 
+    boolean findId(int userId);
+
     List<User> findFriends(int userId);
 
 }

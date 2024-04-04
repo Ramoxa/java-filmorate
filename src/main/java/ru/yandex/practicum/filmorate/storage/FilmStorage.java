@@ -2,13 +2,13 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.Optional;
 
 public interface FilmStorage {
+    Collection<Film> findAll();
 
-    Map<Integer, Film> getAll();
-
-    Film findById(int id);
+    Optional<Film> findById(int id);
 
     Film create(Film film);
 
@@ -19,5 +19,4 @@ public interface FilmStorage {
     boolean userExists(int userId);
 
     boolean filmExists(int filmId);
-
 }
