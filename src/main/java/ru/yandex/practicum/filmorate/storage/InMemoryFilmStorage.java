@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -35,6 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
+        validateFilmExists(film.getId());
         int id = film.getId();
         if (!films.containsKey(id)) {
             throw new NoSuchElementException("Film not found with ID: " + id);
@@ -49,5 +48,11 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NoSuchElementException("Film not found with ID: " + id);
         }
         films.remove(id);
+    }
+
+    private void validateFilmExists(int filmId) {
+        if (!films.containsKey(filmId)) {
+            throw new NotFoundException("Film not found with ID: " + filmId);
+        }
     }
 }

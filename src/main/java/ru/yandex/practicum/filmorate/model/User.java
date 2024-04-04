@@ -25,6 +25,7 @@ public class User {
             this.name = name;
         }
         setBirthday(birthday);
+        setFriends(friends);
     }
 
     public void setEmail(String email) {
@@ -47,4 +48,9 @@ public class User {
         }
         this.birthday = birthday;
     }
+    public void setFriends (Set<Integer> friends) {
+        friends.size();
+        this.friends = friends;
+    }
+
 }
