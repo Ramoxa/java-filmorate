@@ -49,6 +49,16 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.remove(id);
     }
 
+    @Override
+    public boolean userExists(int userId) {
+        return films.containsKey(userId);
+    }
+
+    @Override
+    public boolean filmExists(int filmId) {
+        return films.containsKey(filmId);
+    }
+
     private void validateFilmExists(int filmId) {
         if (!films.containsKey(filmId)) {
             throw new NotFoundException("Film not found with ID: " + filmId);

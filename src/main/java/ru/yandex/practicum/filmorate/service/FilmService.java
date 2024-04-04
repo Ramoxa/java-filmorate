@@ -2,13 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,14 +19,14 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public Map<Integer, Film> findAll() {
-        return filmStorage.getAll();
+    public List<Film> findAll() {
+        return new ArrayList<>(filmStorage.getAll().values());
     }
 
-    public List<Film> getPopularFilms(int amount) {
-        Collection<Film> films = filmStorage.getAll().values();
-
-        return films.stream().sorted(Film::compareTo).limit(amount).collect(Collectors.toList());
+    public List<Film> getPopularFilms(int count) {
+        List<Film> allFilms = (List<Film>) filmStorage.getAll();
+        allFilms.sort((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()));
+        return allFilms.subList(0, Math.min(allFilms.size(), count));
     }
 
     public Film create(Film film) {
@@ -39,26 +38,22 @@ public class FilmService {
     }
 
     public void addLike(int userId, int filmId) {
-        boolean userDoesntExist = filmStorage.getAll().get(userId) == null;
-        boolean filmDoesntExist = filmStorage.getAll().get(filmId) == null;
-
-        if (userDoesntExist) throw new ValidationException("Данного пользователя не существует");
-
-        if (filmDoesntExist) throw new ValidationException("Данного фильма не существует");
-
+        if (!filmStorage.userExists(userId)) {
+            throw new NotFoundException("Данного пользователя не существует");
+        }
+        if (!filmStorage.filmExists(filmId)) {
+            throw new NotFoundException("Данного фильма не существует");
+        }
         filmStorage.findById(filmId).getLikes().add(userId);
     }
 
-
     public void removeLike(int userId, int filmId) {
-        boolean userDoesntExist = filmStorage.getAll().get(userId) == null;
-        boolean filmDoesntExist = filmStorage.getAll().get(filmId) == null;
-        boolean storageIsEmpty = filmStorage.getAll().isEmpty();
-
-        if (userDoesntExist || storageIsEmpty) throw new ValidationException("Данного пользователя не существует");
-
-        if (filmDoesntExist) throw new ValidationException("Данного фильма не существует");
-
+        if (!filmStorage.userExists(userId)) {
+            throw new NotFoundException("Данного пользователя не существует");
+        }
+        if (!filmStorage.filmExists(filmId)) {
+            throw new NotFoundException("Данного фильма не существует");
+        }
         filmStorage.findById(filmId).getLikes().remove(userId);
     }
 

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class Film implements Comparable<Film> {
+public class Film {
     private int id;
     private String name;
     private String description;
@@ -21,11 +21,6 @@ public class Film implements Comparable<Film> {
             throw new ValidationException("Название фильма не может быть пустым");
         }
         this.name = name;
-    }
-
-    @Override
-    public int compareTo(Film other) {
-        return Integer.compare(this.getLikes().size(), other.getLikes().size());
     }
 
     public void setDescription(String description) {

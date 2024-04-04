@@ -20,7 +20,6 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
-    private UserController filmStorage;
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -67,8 +66,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.debug("Самые популярные фильмы", count);
         return filmService.getPopularFilms(count);
     }
-
 }

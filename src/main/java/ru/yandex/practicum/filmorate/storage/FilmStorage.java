@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.Collection;
 import java.util.Map;
 
 public interface FilmStorage {
@@ -15,4 +16,9 @@ public interface FilmStorage {
     Film update(Film film);
 
     void deleteById(int id);
+
+    boolean userExists(int userId);
+
+    boolean filmExists(int filmId);
+
 }
