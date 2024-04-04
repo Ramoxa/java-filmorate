@@ -19,13 +19,14 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
+    public static final String COUNT_OF_POPULAR_FILM = "10";
     private final FilmService filmService;
 
     @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
-    public static final String COUNT_OF_POPULAR_FILM = "10";
+
     @GetMapping
     public ResponseEntity findAll() {
         log.info("Вызван список фильмов.");

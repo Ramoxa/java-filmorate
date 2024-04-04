@@ -48,7 +48,8 @@ public class User {
         }
         this.birthday = birthday;
     }
-    public void setFriends (Set<Integer> friends) {
+
+    public void setFriends(Set<Integer> friends) {
         friends.size();
         this.friends = friends;
     }
