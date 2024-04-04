@@ -34,19 +34,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         validateFilmExists(film.getId());
-        int id = film.getId();
-        if (!films.containsKey(id)) {
-            throw new NoSuchElementException("Film not found with ID: " + id);
-        }
-        films.put(id, film);
+        films.put(film.getId(), film);
         return film;
     }
 
     @Override
     public void deleteById(int id) {
-        if (!films.containsKey(id)) {
-            throw new NoSuchElementException("Film not found with ID: " + id);
-        }
+        validateFilmExists(id);
         films.remove(id);
     }
 
