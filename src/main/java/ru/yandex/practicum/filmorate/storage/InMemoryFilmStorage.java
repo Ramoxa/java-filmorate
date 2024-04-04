@@ -4,29 +4,34 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
+    private final Map<Integer, Film> films;
+    private int id;
 
-    private final Map<Integer, Film> films = new HashMap<>();
-    private final AtomicInteger idGenerator = new AtomicInteger();
+    public InMemoryFilmStorage() {
+        this.films = new HashMap<>();
+        this.id = 0;
+    }
+
 
     @Override
-    public Collection<Film> findAll() {
-        return films.values();
+    public Map<Integer, Film> getAll() {
+        return films;
     }
 
     @Override
-    public Optional<Film> findById(int id) {
-        return Optional.ofNullable(films.get(id));
+    public Film findById(int id) {
+        return films.get(id);
     }
 
     @Override
     public Film create(Film film) {
-        int id = idGenerator.incrementAndGet();
-        film.setId(id);
+        film.setId(++id);
         films.put(id, film);
         return film;
     }

@@ -19,8 +19,8 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    public static final String COUNT_OF_POPULAR_FILM = "10";
     private final FilmService filmService;
+    private UserController filmStorage;
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -44,6 +44,7 @@ public class FilmController {
         log.info("Обновлен фильм: {}", film);
         return ResponseEntity.ok(filmService.update(film));
     }
+
 
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity addLike(@PathVariable int id, @PathVariable int userId) {
