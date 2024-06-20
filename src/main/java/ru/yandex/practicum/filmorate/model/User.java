@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -25,7 +26,10 @@ public class User {
             this.name = name;
         }
         setBirthday(birthday);
-        setFriends(friends);
+        setFriends(new HashSet<>());
+    }
+
+    public User() {
     }
 
     public void setEmail(String email) {
@@ -37,7 +41,7 @@ public class User {
 
     public void setLogin(String login) {
         if (login == null || login.trim().isEmpty() || login.contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
         }
         this.login = login;
     }
@@ -50,8 +54,6 @@ public class User {
     }
 
     public void setFriends(Set<Integer> friends) {
-        friends.size();
-        this.friends = friends;
+        this.friends = Objects.requireNonNullElseGet(friends, HashSet::new);
     }
-
 }
