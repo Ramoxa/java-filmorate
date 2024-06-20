@@ -26,8 +26,5 @@ public class GenreService {
         return genreStorage.getGenreById(id);
     }
 
-    public boolean existsGenreById(int id) {
-        return genreStorage.existsGenreById(id);
-    }
 
 }

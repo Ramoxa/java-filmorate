@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,8 +23,7 @@ public class UserService {
     }
 
     public User getUser(int id) {
-        return userStorage.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID=" + id + " не найден."));
+        return userStorage.findById(id).orElseThrow(() -> new NotFoundException("Пользователь с ID=" + id + " не найден."));
     }
 
     public User create(User user) {
@@ -52,9 +50,7 @@ public class UserService {
 
     public List<User> findUserFriends(int userId) {
         User user = getUser(userId);
-        return user.getFriends().stream()
-                .map(this::getUser)
-                .collect(Collectors.toList());
+        return user.getFriends().stream().map(this::getUser).collect(Collectors.toList());
     }
 
     public Set<User> getCommonFriends(int userId, int otherUserId) {

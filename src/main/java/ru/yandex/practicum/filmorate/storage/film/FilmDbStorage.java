@@ -41,9 +41,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> findAll() {
         List<Film> films = jdbcTemplate.query("SELECT * FROM films", new FilmMapper());
         for (Film film : films) {
-            Set<Genre> filmGenres = (Set<Genre>) genreStorage.getFilmGenres(film.getId()).stream()
-                    .sorted(Comparator.comparingInt(Genre::getId))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<Genre> filmGenres = (Set<Genre>) genreStorage.getFilmGenres(film.getId()).stream().sorted(Comparator.comparingInt(Genre::getId)).collect(Collectors.toCollection(LinkedHashSet::new));
             film.setGenres(filmGenres);
             film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
         }
@@ -58,12 +56,7 @@ public class FilmDbStorage implements FilmStorage {
             return null;
         }
         Film film = films.get(0);
-        film.setGenres(
-                (Set<Genre>) genreStorage.getFilmGenres(id)
-                        .stream()
-                        .sorted(Comparator.comparingInt(Genre::getId))
-                        .collect(Collectors.toCollection(LinkedHashSet::new))
-        );
+        film.setGenres((Set<Genre>) genreStorage.getFilmGenres(id).stream().sorted(Comparator.comparingInt(Genre::getId)).collect(Collectors.toCollection(LinkedHashSet::new)));
         film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
         return film;
     }

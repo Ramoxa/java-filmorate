@@ -48,8 +48,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        int rowsAffected = jdbcTemplate.update("UPDATE users SET name = ?, email = ?, login = ?, birthday = ? WHERE id = ?",
-                user.getName(), user.getEmail(), user.getLogin(), Date.valueOf(user.getBirthday()), user.getId());
+        int rowsAffected = jdbcTemplate.update("UPDATE users SET name = ?, email = ?, login = ?, birthday = ? WHERE id = ?", user.getName(), user.getEmail(), user.getLogin(), Date.valueOf(user.getBirthday()), user.getId());
         if (rowsAffected != 1) {
             throw new NotFoundException("Пользователь не найден ID: " + user.getId());
         }
@@ -72,10 +71,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Set<User> getCommonFriends(int userId, int otherUserId) {
-        List<User> commonFriends = jdbcTemplate.query(
-                "SELECT u.* FROM users u JOIN friends f1 ON u.id = f1.friend_id JOIN friends f2 ON u.id = f2.friend_id WHERE f1.user_id = ? AND f2.user_id = ?",
-                new Object[]{userId, otherUserId},
-                new UserMapper());
+        List<User> commonFriends = jdbcTemplate.query("SELECT u.* FROM users u JOIN friends f1 ON u.id = f1.friend_id JOIN friends f2 ON u.id = f2.friend_id WHERE f1.user_id = ? AND f2.user_id = ?", new Object[]{userId, otherUserId}, new UserMapper());
         return new HashSet<>(commonFriends);
     }
 
