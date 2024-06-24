@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -19,6 +21,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
     private final UserService userService;
 
     @Autowired
@@ -26,26 +29,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<User>> findAll() {
-        log.info("Вызван список пользователей.");
-        return ResponseEntity.ok(userService.findAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Integer id) {
-        User user = userService.getUser(id);
-        if (user != null) {
-            log.info("Получен запрос на пользователя с id = {}", id);
-            return ResponseEntity.ok(user);
-        } else {
-            log.error("Пользователь с ID {} не найден.", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
     @PostMapping
-    public ResponseEntity<User> create(@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         log.debug("Получен запрос на создание пользователя с телом: {}", user);
         User createdUser = userService.create(user);
         log.info("Добавлен пользователь: {}", createdUser);
@@ -53,40 +38,85 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> update(@Valid @RequestBody User user) {
-        if (userService.getUser(user.getId()) == null) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+        try {
+            User updatedUser = userService.update(user);
+            log.info("Обновлен пользователь: {}", updatedUser);
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
             log.error("Ошибка обновления: пользователь с ID {} не найден.", user.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-        User updatedUser = userService.update(user);
-        log.info("Обновлен пользователь: {}", updatedUser);
-        return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> findAllUsers() {
+        log.info("Вызван список пользователей.");
+        return ResponseEntity.ok(userService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> findUserById(@PathVariable Integer id) {
+        try {
+            User user = userService.getUser(id);
+            log.info("Получен запрос на пользователя с id = {}", id);
+            return ResponseEntity.ok(user);
+        } catch (NotFoundException e) {
+            log.error("Пользователь с ID {} не найден.", id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<?> addFriend(@PathVariable int id, @PathVariable int friendId) {
-        log.info("Юзер с ID: {} добавил в друзья юзера с ID: {}", id, friendId);
-        userService.addFriend(id, friendId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> addFriend(@PathVariable int id, @PathVariable int friendId) {
+        try {
+            userService.addFriend(id, friendId);
+            log.info("Пользователь с ID: {} добавил пользователя с ID: {} в друзья", id, friendId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (NotFoundException e) {
+            log.error("Ошибка при добавлении друга: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            log.error("Ошибка при добавлении друга: {}", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Внутренняя ошибка сервера");
+        }
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<?> removeFriend(@PathVariable int id, @PathVariable int friendId) {
-        log.info("Юзер с ID: {} удалил из друзей юзера с ID: {}", id, friendId);
-        userService.removeFriend(id, friendId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        try {
+            userService.removeFriend(id, friendId);
+            log.info("Пользователь с ID: {} удалил пользователя с ID: {} из друзей", id, friendId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (NotFoundException e) {
+            log.error("Ошибка при удалении друга: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            log.error("Ошибка при удалении друга: {}", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Внутренняя ошибка сервера");
+        }
     }
 
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getFriends(@PathVariable int id) {
-        log.info("Вызван список общих друзей");
-        return ResponseEntity.ok(userService.findUserFriends(id));
+        log.info("Получение списка друзей пользователя с ID: {}", id);
+        try {
+            return ResponseEntity.ok(userService.findUserFriends(id));
+        } catch (NotFoundException e) {
+            log.error("Ошибка при получении списка друзей: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public ResponseEntity<Set<User>> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-        log.info("Вызван список друзей");
-        Set<User> commonFriends = userService.getCommonFriends(id, otherId);
-        return ResponseEntity.ok(commonFriends);
+        log.info("Получение списка общих друзей для пользователей с ID: {} и {}", id, otherId);
+        try {
+            Set<User> commonFriends = userService.getCommonFriends(id, otherId);
+            return ResponseEntity.ok(commonFriends);
+        } catch (NotFoundException e) {
+            log.error("Ошибка при получении общих друзей: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }

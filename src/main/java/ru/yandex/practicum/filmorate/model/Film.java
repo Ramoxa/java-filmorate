@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Data
 public class Film {
     private int id;
@@ -14,6 +15,8 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+    private Mpa mpa;
+    private Set<Genre> genres = new HashSet<>();
     private Set<Integer> likes = new HashSet<>();
 
     public void setName(String name) {
@@ -38,9 +41,16 @@ public class Film {
     }
 
     public void setDuration(int duration) {
-        if (duration <= 0) {
+        if (duration < 0) {
             throw new ValidationException("Продолжительность фильма должна быть положительной");
         }
         this.duration = duration;
+    }
+
+    public void setGenres(Set<Genre> genres) {
+        if (genres == null) {
+            throw new ValidationException("Список жанров не может быть пустым");
+        }
+        this.genres = genres;
     }
 }
